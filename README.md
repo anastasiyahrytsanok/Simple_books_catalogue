@@ -8,4 +8,4 @@ This application allows users to search for books using the Open Library API, br
 
 ```bash
 npm run build
-npm run build
+npm run dev
