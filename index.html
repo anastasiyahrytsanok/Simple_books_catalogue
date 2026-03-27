@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>The Library</title>
+  </head>
+  <body>
+    <header>
+      <div class="logo">
+        <img
+          class="icon icon--book"
+          src="/src/assets/icons/book.svg"
+          alt="book icon"
+        />
+      </div>
+      <div class="name">
+        <h3 class="name__title">The Library</h3>
+        <p class="name__description">Discover your next favorite book</p>
+      </div>
+    </header>
+
+    <main>
+      <form  id="search-book-form">
+        <h1 class="search__title">Discover Your Next Great Read</h1>
+        <p class="search__description">
+          Search millions of books, build your personal library, and never lose
+          track of what to read next.
+        </p>
+
+        <div class="search__controls">
+          <div class="search__input-wrapper">
+            <img
+              class="icon icon--search"
+              src="/src/assets/icons/search.svg"
+              alt="search icon"
+            />
+
+            <input
+              class="search__input"
+              type="text"
+              id="searchInput"
+              placeholder="Search books by title or author..."
+            />
+          </div>
+
+          <button class="search__button" id="searchBtn" type="button">
+            Search
+          </button>
+        </div>
+      </form>
+      <div class="book-section-wrapper">
+        <section id="bookList"></section>
+        <aside id="favorites">
+          <div class="favorites_name-block">
+            <div class="favorites_logo">
+              <img
+                class="icon favorites__icon--like"
+                src="/src/assets/icons/LikeEmptyGreen.svg"
+                alt="like icon"
+              />
+            </div>
+            <div class="favorites__name">
+              <h3 class="favorites__name__title">Favorites</h3>
+              <p id="favorites__name__description">0 books saved</p>
+            </div>
+          </div>
+          <div id="favorite-book__list"></div>
+        </aside>
+      </div>
+    </main>
+
+    <footer>
+      <p>Powered by <a href="https://openlibrary.org/">Open Library</a></p>
+    </footer>
+
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
