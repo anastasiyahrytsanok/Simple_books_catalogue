@@ -37,7 +37,6 @@ export class App {
     this.render.hideFavorites();
     const books = await this.#fetchBooks(DEFAULT_SEARCH_QUERY);
     const markedBooks = this.#markFavoriteBooks(books);
-    this.books = markedBooks;
     this.render.renderBooks(markedBooks, this.handleLikeClick);
     this.render.showFavorites();
   }
@@ -106,7 +105,6 @@ export class App {
 
       const books = await this.#fetchBooks(query);
       const markedBooks = this.#markFavoriteBooks(books);
-      this.books = markedBooks;
       this.render.renderBooks(markedBooks, this.handleLikeClick);
     } catch (error: unknown) {
       this.render.renderError("Failed to search books");
