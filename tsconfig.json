@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ES6",
+    "module": "ESNext",
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "strict": true,
+    "allowJs": true,
+    "checkJs": true
+  },
+  "include": ["src"]
+}

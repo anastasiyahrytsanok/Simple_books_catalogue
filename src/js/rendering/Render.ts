@@ -1,31 +1,49 @@
-const DATA_ID_ATTRIBUTE = "data-id";
-const DATA_FAVORITE_ID_ATTRIBUTE = "data-favorite-id";
 import likeFilledIcon from "../../assets/icons/LikeFilled.svg";
 import likeEmptyGreyIcon from "../../assets/icons/LikeEmptyGrey.svg";
+import { ExtendedBook } from "../../types/books";
+
+const DATA_ID_ATTRIBUTE = "data-id" as const;
+const DATA_FAVORITE_ID_ATTRIBUTE = "data-favorite-id" as const;
+
+type BookHandler = (book: ExtendedBook) => void;
+type SearchHandler = () => void | Promise<void>;
 
 export class Render {
+  readonly bookList: HTMLElement | null;
+  readonly favoriteBookList: HTMLElement | null;
+  readonly searchInputElement: HTMLInputElement | null;
+  readonly searchButton: HTMLButtonElement | null;
+  readonly searchBookForm: HTMLFormElement | null;
+  readonly favoritesSection: HTMLElement | null;
+
   constructor() {
     this.bookList = document.getElementById("bookList");
     this.favoriteBookList = document.getElementById("favorite-book__list");
-    this.searchInputElement = document.getElementById("searchInput");
-    this.searchButton = document.getElementById("searchBtn");
-    this.searchBookForm = document.getElementById("search-book-form");
+    this.searchInputElement = document.getElementById(
+      "searchInput",
+    ) as HTMLInputElement | null;
+    this.searchButton = document.getElementById(
+      "searchBtn",
+    ) as HTMLButtonElement | null;
+    this.searchBookForm = document.getElementById(
+      "search-book-form",
+    ) as HTMLFormElement | null;
     this.favoritesSection = document.getElementById("favorites");
   }
 
-  renderBooks(books, onBookClick) {
+  renderBooks(books: ExtendedBook[], onBookClick: BookHandler): void {
     if (books.length === 0) {
-      this.bookList.replaceChildren(this.#createEmptyBookListElement());
+      this.bookList?.replaceChildren(this.#createEmptyBookListElement());
     } else {
       const bookCards = books.map((book) =>
         this.#createBookCardElement(book, onBookClick),
       );
-      this.bookList.replaceChildren(...bookCards);
+      this.bookList?.replaceChildren(...bookCards);
     }
   }
 
-  rerenderBook(book, onBookClick) {
-    const oldBookCard = this.bookList.querySelector(
+  rerenderBook(book: ExtendedBook, onBookClick: BookHandler): void {
+    const oldBookCard = this.bookList?.querySelector(
       `[${DATA_ID_ATTRIBUTE}="${book.key}"]`,
     );
 
@@ -35,15 +53,15 @@ export class Render {
     }
   }
 
-  renderFavoritesBooks(books, onLikeClick) {
+  renderFavoritesBooks(books: ExtendedBook[], onLikeClick: BookHandler): void {
     const favoriteBooksElements = books.map((book) =>
       this.#createFavoriteBookElement(book, onLikeClick),
     );
-    this.favoriteBookList.replaceChildren(...favoriteBooksElements);
+    this.favoriteBookList?.replaceChildren(...favoriteBooksElements);
   }
 
-  removeFavoriteBook(bookId) {
-    const oldFavoriteBookElement = this.favoriteBookList.querySelector(
+  removeFavoriteBook(bookId: string): void {
+    const oldFavoriteBookElement = this.favoriteBookList?.querySelector(
       `[${DATA_FAVORITE_ID_ATTRIBUTE}="${bookId}"]`,
     );
 
@@ -52,12 +70,12 @@ export class Render {
     }
   }
 
-  addFavoriteBook(book, onLikeClick) {
+  addFavoriteBook(book: ExtendedBook, onLikeClick: BookHandler): void {
     const newFavoriteBook = this.#createFavoriteBookElement(book, onLikeClick);
-    this.favoriteBookList.appendChild(newFavoriteBook);
+    this.favoriteBookList?.appendChild(newFavoriteBook);
   }
 
-  renderFavoriteBooksCount(count) {
+  renderFavoriteBooksCount(count: number): void {
     const favoriteBooksCountElement = document.getElementById(
       "favorites__name__description",
     );
@@ -66,19 +84,19 @@ export class Render {
     }
   }
 
-  renderError(message) {
+  renderError(message: string): void {
     const errorElement = document.createElement("div");
     errorElement.className = "book-list__error";
     errorElement.textContent = message;
 
-    this.bookList.replaceChildren(errorElement);
+    this.bookList?.replaceChildren(errorElement);
   }
 
-  renderLoading() {
-    this.bookList.replaceChildren(this.#createLoadingElement());
+  renderLoading(): void {
+    this.bookList?.replaceChildren(this.#createLoadingElement());
   }
 
-  setSearchDisabled(isDisabled) {
+  setSearchDisabled(isDisabled: boolean): void {
     if (this.searchButton) {
       this.searchButton.disabled = isDisabled;
     }
@@ -88,30 +106,37 @@ export class Render {
     }
   }
 
-  getSearchQuery() {
+  getSearchQuery(): string {
     return this.searchInputElement?.value.trim().toLowerCase() || "";
   }
 
-  bindSearchSubmit(handler) {
-    this.searchBookForm?.addEventListener("submit", (e) => {
+  bindSearchSubmit(handler: SearchHandler): void {
+    this.searchBookForm?.addEventListener("submit", (e: SubmitEvent) => {
       e.preventDefault();
-      handler();
+      void handler();
     });
   }
 
-  bindSearchClick(handler) {
-    this.searchButton?.addEventListener("click", handler);
+  bindSearchClick(handler: SearchHandler): void {
+    this.searchButton?.addEventListener("click", () => void handler());
   }
 
-  hideFavorites() {
+  hideFavorites(): void {
+    if (!this.favoritesSection) return;
+
     this.favoritesSection.style.display = "none";
   }
 
-  showFavorites() {
+  showFavorites(): void {
+    if (!this.favoritesSection) return;
+
     this.favoritesSection.style.display = "";
   }
 
-  #createBookCardElement(book, onBookClick) {
+  #createBookCardElement(
+    book: ExtendedBook,
+    onBookClick: BookHandler,
+  ): HTMLElement {
     const bookCardElement = document.createElement("div");
     bookCardElement.className = "book-card";
     bookCardElement.setAttribute(DATA_ID_ATTRIBUTE, book.key);
@@ -121,7 +146,7 @@ export class Render {
 
     const title = document.createElement("h3");
     title.className = "book-card__title";
-    title.textContent = book.title || "No title";
+    title.textContent = book.title;
     bookCardElement.appendChild(title);
 
     const author = document.createElement("p");
@@ -131,7 +156,9 @@ export class Render {
 
     const year = document.createElement("p");
     year.className = "book-card__year";
-    year.textContent = book.first_publish_year || "—";
+    year.textContent = book.first_publish_year
+      ? String(book.first_publish_year)
+      : "—";
     bookCardElement.appendChild(year);
 
     const likeButtonElement = document.createElement("button");
@@ -151,10 +178,13 @@ export class Render {
     return bookCardElement;
   }
 
-  #createFavoriteBookElement(book, onLikeClick) {
+  #createFavoriteBookElement(
+    book: ExtendedBook,
+    onLikeClick: BookHandler,
+  ): HTMLElement {
     const favoriteBookElement = document.createElement("div");
     favoriteBookElement.className = "favorite-book-block";
-    favoriteBookElement.setAttribute("data-favorite-id", book.key);
+    favoriteBookElement.setAttribute(DATA_FAVORITE_ID_ATTRIBUTE, book.key);
 
     const favoriteBookCard = document.createElement("div");
     favoriteBookCard.className = "favorite-book-card";
@@ -167,7 +197,7 @@ export class Render {
 
     const title = document.createElement("h3");
     title.className = "favorite-book-card__title";
-    title.textContent = book.title || "No title";
+    title.textContent = book.title;
 
     const author = document.createElement("p");
     author.className = "favorite-book-card__author";
@@ -175,7 +205,9 @@ export class Render {
 
     const year = document.createElement("p");
     year.className = "favorite-book-card__year";
-    year.textContent = book.first_publish_year || "—";
+    year.textContent = book.first_publish_year
+      ? String(book.first_publish_year)
+      : "—";
 
     description.appendChild(title);
     description.appendChild(author);
@@ -201,21 +233,21 @@ export class Render {
     return favoriteBookElement;
   }
 
-  #createLoadingElement() {
+  #createLoadingElement(): HTMLElement {
     const el = document.createElement("div");
     el.className = "book-list__loading";
     el.textContent = "Loading...";
     return el;
   }
 
-  #createEmptyBookListElement() {
+  #createEmptyBookListElement(): HTMLElement {
     const el = document.createElement("div");
     el.className = "book-list__empty";
     el.textContent = "No books found";
     return el;
   }
 
-  #createBookCoverElement(book, isMini) {
+  #createBookCoverElement(book: ExtendedBook, isMini: boolean): HTMLElement {
     const coverUrl = book.cover_i
       ? `https://covers.openlibrary.org/b/id/${book.cover_i}-M.jpg`
       : null;
@@ -224,7 +256,7 @@ export class Render {
       const img = document.createElement("img");
       img.className = `${isMini ? "favorite-" : ""}book-card__image`;
       img.src = coverUrl;
-      img.alt = book.title || "Book cover";
+      img.alt = book.title;
       return img;
     } else {
       const placeholder = document.createElement("div");
